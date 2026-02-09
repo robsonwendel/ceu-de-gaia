@@ -749,41 +749,40 @@ def setup_admin():
         return f"Erro ao criar administrador: {e}"
     
 
-@app.route('/cadastrar_professor_manual')
+@app.route('/cadastrar_professor', methods=['POST'])
 @login_required
-def cadastrar_professor_manual():
-    # Apenas o administrador pode acessar esta rota para criar professores
+def cadastrar_professor():
     if not current_user.is_admin:
         flash('Acesso negado!', 'danger')
         return redirect(url_for('home'))
 
-    # Dados do Professor (Exemplo - você pode alterar aqui antes de acessar a rota)
-    nome_prof = "Aline Lins"
-    email_prof = "aline@email.com"
-    senha_prof = "2026"
+    nome = request.form.get('nome')
+    email = request.form.get('email')
+    senha = request.form.get('senha')
 
-    # Verifica se o e-mail já existe
-    if User.query.filter_by(email=email_prof).first():
-        return f"O professor com e-mail {email_prof} já existe!"
+    if User.query.filter_by(email=email).first():
+        flash('Este e-mail já está cadastrado!', 'warning')
+        return redirect(url_for('admin_dashboard'))
 
-    hashed_password = bcrypt.generate_password_hash(senha_prof).decode('utf-8')
-    
-    novo_professor = User(
-        username=nome_prof,      # Nome Completo
-        email=email_prof,         # E-mail de Login
+    hashed_password = bcrypt.generate_password_hash(senha).decode('utf-8')
+    novo_prof = User(
+        username=nome,
+        email=email,
         password=hashed_password,
-        role='professor',         # Define a função como professor
+        role='professor',
         is_approved=True,
         is_admin=False
     )
-    
+
     try:
-        db.session.add(novo_professor)
+        db.session.add(novo_prof)
         db.session.commit()
-        return f"Professor(a) {nome_prof} cadastrado(a) com sucesso!"
+        flash(f'Professor(a) {nome} cadastrado(a) com sucesso!', 'success')
     except Exception as e:
         db.session.rollback()
-        return f"Erro ao cadastrar professor: {e}"
+        flash(f'Erro ao cadastrar: {e}', 'danger')
+
+    return redirect(url_for('admin_dashboard'))
 
 if __name__ == '__main__':
     with app.app_context():
