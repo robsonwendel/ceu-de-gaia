@@ -686,6 +686,34 @@ def historico_presenca(aluno_id):
                            historico=historico, 
                            frequencia=frequencia)
 
+@app.route('/adicionar_conta', methods=['POST'])
+@login_required
+def adicionar_conta():
+    if not current_user.is_admin:
+        return redirect(url_for('home'))
+
+    descricao = request.form.get('descricao')
+    valor = request.form.get('valor')
+    vencimento_raw = request.form.get('vencimento')
+
+    if descricao and valor and vencimento_raw:
+        try:
+            vencimento = datetime.strptime(vencimento_raw, '%Y-%m-%d').date()
+            nova_conta = ContasPagar(
+                descricao=descricao,
+                valor=float(valor),
+                vencimento=vencimento,
+                status='Pendente'
+            )
+            db.session.add(nova_conta)
+            db.session.commit()
+            flash('Conta adicionada com sucesso!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erro ao adicionar conta: {e}', 'danger')
+    
+    return redirect(url_for('admin_dashboard'))
+
 @app.route('/setup_admin')
 def setup_admin():
     # Dados do novo administrador
