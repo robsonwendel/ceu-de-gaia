@@ -320,16 +320,61 @@
 
     <!-- Contato -->
     <section id="contact" class="py-5 bg-light">
-        <div class="container text-center">
-            <h2>Contato</h2>
-            <p class="lead">Entre em contato conosco para saber mais.</p>
-            <a href="mailto:contato@yogaschool.com.br" class="btn btn-primary">Enviar Email</a>
+      <div class="text-center py-5">
+    <h2>Contato</h2>
+    <p>Entre em contato conosco para saber mais.</p>
+    
+    <div class="d-flex justify-content-center gap-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEmail">
+            <i class="fas fa-envelope me-2"></i>Enviar Email
+        </button>
+
+        <a href="https://wa.me/556492201223?text=Olá! Gostaria de informações sobre as aulas na Céu de Gaia." 
+           target="_blank" class="btn btn-success">
+            <i class="fab fa-whatsapp me-2"></i>WhatsApp
+        </a>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEmail" tabindex="-1" aria-labelledby="modalEmailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEmailLabel">Nosso E-mail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Clique no botão abaixo para copiar o endereço:</p>
+                <div class="input-group mb-3">
+                    <input type="text" value="contato@ceudegaia.cloud" id="emailCopy" class="form-control" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copiarEmail()">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                </div>
+                <div id="msgCopiado" class="text-success small" style="display: none;">E-mail copiado com sucesso!</div>
+            </div>
         </div>
+    </div>
+</div>
+
+<script>
+function copiarEmail() {
+    var copyText = document.getElementById("emailCopy");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // Para dispositivos móveis
+    navigator.clipboard.writeText(copyText.value);
+    
+    // Mostrar mensagem de sucesso
+    var msg = document.getElementById("msgCopiado");
+    msg.style.display = "block";
+    setTimeout(function() { msg.style.display = "none"; }, 2000);
+}
+</script>
     </section>
 
     <!-- Footer -->
     <footer class="py-4 bg-dark text-white text-center">
-        <p>&copy; 2025 Céu de Gaia. Todos os direitos reservados.</p>
+        <p>&copy; 2026 Céu de Gaia. Todos os direitos reservados.</p>
     </footer>
 
     <!-- Bootstrap JS -->
