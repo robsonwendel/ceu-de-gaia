@@ -1,0 +1,84 @@
+.hero-section {
+    background: url('/static/images/hero1.jpeg') no-repeat center center/cover;
+    height: 80vh;
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    padding: 0 20px;
+}
+
+/* Fundo translúcido para o texto */
+.hero-section .text-container {
+    background: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Título */
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    font-family: 'Georgia', serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Descrição */
+.hero-section p {
+    font-size: 1.2rem;
+    margin: 10px 0 20px 0;
+    color: #f0f0f0;
+    line-height: 1.6;
+}
+
+/* Botão */
+.hero-section a.btn {
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    border-radius: 25px;
+    background-color: #007bff;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.hero-section a.btn:hover {
+    background-color: #0056b3;
+    color: #f0f0f0;
+}
+
+
+/* Estilo para o topo */
+.navbar {
+    padding: 15px 20px;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    color: #ffffff !important;
+    font-family: 'Georgia', serif;
+}
+
+.nav-link {
+    margin-right: 15px;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #d4d4d4 !important;
+}
+
+.navbar-dark .navbar-toggler-icon {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Sombra na barra */
+.navbar {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+

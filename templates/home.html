@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Yoga School - Conecte seu Corpo</title>
+        <!-- Bootstrap CSS via CDN -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Estilos Personalizados -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    </head>
+<body>
+   <!-- Navbar -->
+   <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">Céu de Gaia</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('home') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="#about">Sobre Nós</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="#courses">Cursos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('horarios') }}">Horários</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="#contact">Contato</a>
+                </li>
+
+
+                <!-- Navbar Dinâmica -->
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'professor' %}
+                      <!-- Opção para Professor que é Admin -->
+                      <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                    </li>
+                {% elif current_user.role == 'professor' %}
+                    <!-- Opção para Professor -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('professor_dashboard') }}">Gerenciar Alunos</a>
+                    </li>
+                {% elif current_user.role == 'aluno' %}
+                    <!-- Opção para Aluno -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('aluno_dashboard', aluno_id=current_user.id) }}">Minha Conta</a>
+                    </li>
+                {% endif %}
+                <!-- Logout para usuários autenticados -->
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            {% else %}
+                <!-- Opções para visitantes não autenticados -->
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('login') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('register') }}">Registrar</a>
+                </li>
+            {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+    <!-- Hero Section -->
+    <header class="hero-section d-flex align-items-center justify-content-center text-center">
+        <div class="text-container">
+            <h1>Conecte-se com o Universo Interior</h1>
+            <p>Explore a harmonia entre corpo, mente e espírito através de nossas práticas de yoga.</p>
+            <a href="#courses" class="btn btn-primary btn-lg">Explore Nossas aulas</a>
+        </div>
+    </header>
+    
+
+    <!-- Sobre Nós -->
+<section id="about" class="py-5 bg-light">
+    <div class="container text-center">
+        <h2>Sobre Nós</h2>
+        <p class="lead">Ceu de Gaia é um espaço dedicado ao bem-estar e à conexão interior.</p>
+
+        <!-- Cards dos Professores -->
+        <div class="row mt-4">
+            <!-- Professor 1 -->
+            <div class="col-md-3">
+                <div class="card" role="button" data-bs-toggle="modal" data-bs-target="#modalProfessor1">
+                    <img src="{{ url_for('static', filename='images/professor1.jpeg') }}" class="card-img-top" alt="Professor 1">
+                    <div class="card-body">
+                        <h5 class="card-title">Rúbia Garcia</h5>
+                        <p class="card-text"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Professor 1 -->
+            <div class="modal fade" id="modalProfessor1" tabindex="-1" aria-labelledby="modalProfessor1Label" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalProfessor1Label">Rúbia Garcia</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/prof1.jpeg') }}" class="img-fluid mb-3" alt="Rúbia Garcia">
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professor 2 -->
+            <div class="col-md-3">
+                <div class="card" role="button" data-bs-toggle="modal" data-bs-target="#modalProfessor2">
+                    <img src="{{ url_for('static', filename='images/professor2.jpeg') }}" class="card-img-top" alt="Professor 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Aline Lins</h5>
+                        <p class="card-text"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Professor 2 -->
+            <div class="modal fade" id="modalProfessor2" tabindex="-1" aria-labelledby="modalProfessor2Label" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalProfessor2Label">Aline Lins</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/prof2.jpeg') }}" class="img-fluid mb-3" alt="Aline Lins">
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professor 3 -->
+            <div class="col-md-3">
+                <div class="card" role="button" data-bs-toggle="modal" data-bs-target="#modalProfessor3">
+                    <img src="{{ url_for('static', filename='images/professor3.jpeg') }}" class="card-img-top" alt="Professor 3">
+                    <div class="card-body">
+                        <h5 class="card-title">Marina Lucinda</h5>
+                        <p class="card-text"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Professor 3 -->
+            <div class="modal fade" id="modalProfessor3" tabindex="-1" aria-labelledby="modalProfessor3Label" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalProfessor3Label">Marina Lucinda</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/prof3.jpeg') }}" class="img-fluid mb-3" alt="Marina Lucinda">
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+   <!-- Cursos -->
+<section id="courses" class="py-5">
+    <div class="container text-center">
+        <h2>Cursos</h2>
+        <div class="row mt-4">
+            <!-- Curso 1: Hatha Yoga -->
+            <div class="col-md-4">
+                <div class="card" data-bs-toggle="modal" data-bs-target="#modalHatha">
+                    <img src="{{ url_for('static', filename='images/course1.jpg') }}" class="card-img-top" alt="Hatha Yoga">
+                    <div class="card-body">
+                        <h5 class="card-title">Hatha Yoga</h5>
+                        <p class="card-text">Práticas suaves e meditativas.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal para Hatha Yoga -->
+            <div class="modal fade" id="modalHatha" tabindex="-1" aria-labelledby="modalHathaLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalHathaLabel">Hatha Yoga</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/hatham.jpeg') }}" class="img-fluid mb-3" alt="Hatha Yoga">
+                            <p>Hatha Yoga oferece práticas suaves e meditativas para alinhar corpo e mente, com foco no equilíbrio e relaxamento.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Curso 2: Vinyasa Yoga -->
+            <div class="col-md-4">
+                <div class="card" data-bs-toggle="modal" data-bs-target="#modalVinyasa">
+                    <img src="{{ url_for('static', filename='images/course2.jpeg') }}" class="card-img-top" alt="Vinyasa Yoga">
+                    <div class="card-body">
+                        <h5 class="card-title">Vinyasa Yoga</h5>
+                        <p class="card-text">Movimentos dinâmicos e fluidos.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal para Vinyasa Yoga -->
+            <div class="modal fade" id="modalVinyasa" tabindex="-1" aria-labelledby="modalVinyasaLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalVinyasaLabel">Vinyasa Yoga</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/vinyasam.jpeg') }}" class="img-fluid mb-3" alt="Vinyasa Yoga">
+                            <p>Vinyasa Yoga combina movimentos dinâmicos e fluidos com a respiração, promovendo força e flexibilidade.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Curso 3: Yoga Terapêutico -->
+            <div class="col-md-4">
+                <div class="card" data-bs-toggle="modal" data-bs-target="#modalTerapia">
+                    <img src="{{ url_for('static', filename='images/course3.jpeg') }}" class="card-img-top" alt="Yoga Terapêutico">
+                    <div class="card-body">
+                        <h5 class="card-title">Yoga Terapêutico</h5>
+                        <p class="card-text">Cuidados personalizados para saúde e bem-estar.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal para Yoga Terapêutico -->
+            <div class="modal fade" id="modalTerapia" tabindex="-1" aria-labelledby="modalTerapiaLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalTerapiaLabel">Yoga Terapêutico</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/terapeuticom.jpeg') }}" class="img-fluid mb-3" alt="Yoga Terapêutico">
+                            <p>Yoga Terapêutico utiliza técnicas personalizadas para tratar e prevenir problemas de saúde, respeitando as limitações de cada pessoa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Curso 4: Ashtanga Yoga -->
+            <div class="col-md-4 mt-4">
+                <div class="card" data-bs-toggle="modal" data-bs-target="#modalAshtanga">
+                    <img src="{{ url_for('static', filename='images/ashtanga.jpg') }}" class="card-img-top" alt="Ashtanga Yoga">
+                    <div class="card-body">
+                        <h5 class="card-title">Ashtanga Yoga</h5>
+                        <p class="card-text">Sequências intensas com foco em disciplina e autossuperação.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal para Ashtanga Yoga -->
+            <div class="modal fade" id="modalAshtanga" tabindex="-1" aria-labelledby="modalAshtangaLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalAshtangaLabel">Ashtanga Yoga</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/ashytangam.jpeg') }}" class="img-fluid mb-3" alt="Ashtanga Yoga">
+                            <p>Ashtanga Yoga promove disciplina e autossuperação com sequências intensas e estruturadas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Curso 5: Pilates Solo -->
+            <div class="col-md-4 mt-4">
+                <div class="card" data-bs-toggle="modal" data-bs-target="#modalPilates">
+                    <img src="{{ url_for('static', filename='images/pilates.jpg') }}" class="card-img-top" alt="Pilates Solo">
+                    <div class="card-body">
+                        <h5 class="card-title">Pilates Solo</h5>
+                        <p class="card-text">Fortaleça o core e melhore a flexibilidade com exercícios no solo.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal para Pilates Solo -->
+            <div class="modal fade" id="modalPilates" tabindex="-1" aria-labelledby="modalPilatesLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalPilatesLabel">Pilates Solo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/pilatesm.jpeg') }}" class="img-fluid mb-3" alt="Pilates Solo">
+                            <p>Pilates Solo é focado no fortalecimento do core e na melhora da flexibilidade, utilizando apenas o peso do corpo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- Contato -->
+    <section id="contact" class="py-5 bg-light">
+        <div class="container text-center">
+            <h2>Contato</h2>
+            <p class="lead">Entre em contato conosco para saber mais.</p>
+            <a href="mailto:contato@yogaschool.com.br" class="btn btn-primary">Enviar Email</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-dark text-white text-center">
+        <p>&copy; 2025 Céu de Gaia. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', filename='bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

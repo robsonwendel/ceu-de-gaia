@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração | Céu de Gaia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .card { border-radius: 15px; border: none; }
+        .card-header { border-radius: 15px 15px 0 0 !important; font-weight: bold; }
+        .summary-card { transition: transform 0.2s; }
+        .summary-card:hover { transform: translateY(-5px); }
+        .filter-input { border-radius: 20px; padding-left: 15px; }
+        .section-title { border-left: 5px solid #0d6efd; padding-left: 15px; margin-bottom: 25px; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">Céu de Gaia</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('home') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <h1 class="text-center mb-5 fw-bold">Painel de Controle Administrativo</h1>
+
+    <div class="row g-4 mb-5 text-center">
+        <div class="col-md-4">
+            <div class="card summary-card shadow bg-white border-start border-success border-5 p-3">
+                <h6 class="text-muted small">Mensalidades a Receber</h6>
+                <h2 class="text-success fw-bold">R$ {{ "%.2f"|format(total_receber) }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card shadow bg-white border-start border-danger border-5 p-3">
+                <h6 class="text-muted small">Despesas a Pagar</h6>
+                <h2 class="text-danger fw-bold">R$ {{ "%.2f"|format(total_pagar) }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card shadow bg-white border-start border-info border-5 p-3">
+                <h6 class="text-muted small">Saldo Previsto (Mês)</h6>
+                <h2 class="text-info fw-bold">R$ {{ "%.2f"|format(saldo_estimado) }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-5 border-danger">
+        <div class="card-header bg-danger text-white">Lançar Nova Despesa</div>
+        <div class="card-body bg-light">
+            <form method="POST" action="{{ url_for('adicionar_conta') }}">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" name="descricao" placeholder="Descrição (Ex: Luz, Aluguel)" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" name="valor" step="0.01" placeholder="Valor R$" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" class="form-control" name="vencimento" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-danger w-100">Lançar</button>
+                    </div>
+                </div>
+            </form>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mt-3 mb-2">
+                <h6 class="fw-bold mb-0">Contas Cadastradas</h6>
+                <input type="text" id="filtroContas" class="form-control form-control-sm filter-input w-25" placeholder="Filtrar contas...">
+            </div>
+            <table class="table table-sm table-hover" id="tabelaContas">
+                <thead class="table-light">
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Vencimento</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conta in contas_pagar %}
+                    <tr>
+                        <td>{{ conta.descricao }}</td>
+                        <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
+                        <td>R$ {{ "%.2f"|format(conta.valor) }}</td>
+                        <td><span class="badge {{ 'bg-warning text-dark' if conta.status == 'Pendente' else 'bg-success' }}">{{ conta.status }}</span></td>
+                        <td>
+                            {% if conta.status == 'Pendente' %}
+                            <form method="POST" action="{{ url_for('marcar_pago_conta', conta_id=conta.id) }}">
+                                <button type="submit" class="btn btn-outline-success btn-sm">Baixa</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+<a href="{{ url_for('relatorio_financeiro_professor') }}"
+   class="btn btn-outline-primary fw-bold mb-3">
+   📊 Relatório Financeiro por Professor
+</a>
+
+    <div class="card shadow mb-5 border-primary">
+    <div class="card-header bg-primary text-white">Gerar Mensalidades em Lote</div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('gerar_mensalidades_lote') }}">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">1. Selecione os Alunos:</label>
+                    <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto; background: white;">
+                        {% for aluno in alunos %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="alunos_ids" value="{{ aluno.id }}" id="aluno{{ aluno.id }}">
+                            <label class="form-check-label" for="aluno{{ aluno.id }}">
+                                {{ aluno.username }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">2. Mês/Ano:</label>
+                    <input type="month" name="mes_referencia" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">3. Valor Padrão (R$):</label>
+                    <input type="number" name="valor" step="0.01" class="form-control" placeholder="200.00" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Gerar Agora</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <div class="card shadow mb-5">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <span>Controle de Mensalidades & Alunos</span>
+            <input type="text" id="filtroMensalidades" class="form-control form-control-sm filter-input w-25" placeholder="Filtrar aluno ou mês...">
+        </div>
+        <div class="card-body">
+            <table class="table table-hover align-middle" id="tabelaMensalidades">
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Mês</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mensalidade in mensalidades %}
+                    <tr>
+                        <td>
+                            <strong>{{ mensalidade.aluno.username }}</strong><br>
+                            <a href="{{ url_for('historico_presenca', aluno_id=mensalidade.aluno.id) }}" class="text-decoration-none small">
+                                <i class="bi bi-calendar-check"></i> Ver Frequência
+                            </a>
+                        </td>
+                        <td>{{ mensalidade.mes }}</td>
+                        <td>R$ {{ "%.2f"|format(mensalidade.valor) }}</td>
+                        <td>
+                            <span class="badge {{ 'bg-warning text-dark' if mensalidade.status == 'Pendente' else 'bg-success' }}">
+                                {{ mensalidade.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if mensalidade.status == 'Pendente' %}
+                            <form method="POST" action="{{ url_for('marcar_pago_mensalidade', mensalidade_id=mensalidade.id) }}">
+                                <button type="submit" class="btn btn-success btn-sm">Receber</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h2 class="section-title">Gerenciar Turmas Ativas</h2>
+    <div class="card shadow p-4 mb-5">
+        <form action="{{ url_for('criar_turma') }}" method="POST" class="row g-3 mb-4">
+            <div class="col-md-6">
+                <input type="text" name="nome" class="form-control" placeholder="Nome da Turma" required>
+            </div>
+            <div class="col-md-4">
+                <select name="professor_id" class="form-select" required>
+                    <option value="" disabled selected>Professor Responsável</option>
+                    {% for prof in professores %}
+                        <option value="{{ prof.id }}">{{ prof.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Criar</button>
+            </div>
+        </form>
+        <table class="table table-hover" id="tabelaTurmas">
+            <thead>
+                <tr>
+                    <th>Turma</th>
+<th>Professor</th>
+<th>Alunos</th>
+<th>Inadimplentes</th>
+<th>Status</th>
+<th>Ações</th>
+
+                </tr>
+            </thead>
+            <tbody>
+    {% for turma, total_alunos, inadimplentes in turmas %}
+    <tr>
+        <td>{{ turma.nome }}</td>
+        <td>{{ turma.professor.username if turma.professor else '-' }}</td>
+
+        <td>
+            <span class="badge bg-primary">
+                {{ total_alunos }}
+            </span>
+        </td>
+
+        <td>
+            {% if inadimplentes > 0 %}
+                <span class="badge bg-danger">
+                    {{ inadimplentes }}
+                </span>
+            {% else %}
+                <span class="badge bg-success">
+                    0
+                </span>
+            {% endif %}
+        </td>
+
+        <td>
+            <span class="badge bg-success">Ativa</span>
+        </td>
+
+        <td>
+            <!-- seus botões -->
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function configurarFiltro(idInput, idTabela) {
+        document.getElementById(idInput).addEventListener('keyup', function() {
+            let filtro = this.value.toLowerCase();
+            let linhas = document.querySelectorAll(`#${idTabela} tbody tr`);
+            linhas.forEach(linha => {
+                linha.style.display = linha.innerText.toLowerCase().includes(filtro) ? '' : 'none';
+            });
+        });
+    }
+    configurarFiltro('filtroContas', 'tabelaContas');
+    configurarFiltro('filtroMensalidades', 'tabelaMensalidades');
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

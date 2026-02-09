@@ -1,0 +1,10 @@
+<div class="container mt-5">
+    <h1>Atualizar Matrícula</h1>
+    <form method="POST" action="{{ url_for('update_matricula', aluno_id=aluno.id) }}">
+        <div class="mb-3">
+            <label for="turma" class="form-label">Nova Turma:</label>
+            <input type="text" id="turma" name="turma" class="form-control" value="{{ aluno.turma or '' }}">
+        </div>
+        <button type="submit" class="btn btn-success">Atualizar</button>
+    </form>
+</div>

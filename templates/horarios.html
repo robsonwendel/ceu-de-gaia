@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoga School - Horários</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .schedule-table {
+            border: 1px solid #ccc;
+            margin: 20px auto;
+            text-align: center;
+            background: #f9f9f9;
+        }
+        .schedule-table th, .schedule-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .schedule-table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .schedule-table td {
+            background-color: #e6f0fa;
+        }
+        .schedule-btn {
+            width: 100%;
+            padding: 5px 0;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .schedule-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">Céu de Gaia</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('home') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="#about">Sobre Nós</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="#courses">Cursos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('horarios') }}">Horários</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="#contact">Contato</a>
+                </li>
+
+
+                <!-- Navbar Dinâmica -->
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'professor' %}
+                      <!-- Opção para Professor que é Admin -->
+                      <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                    </li>
+                {% elif current_user.role == 'professor' %}
+                    <!-- Opção para Professor -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('professor_dashboard') }}">Gerenciar Alunos</a>
+                    </li>
+                {% elif current_user.role == 'aluno' %}
+                    <!-- Opção para Aluno -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('aluno_dashboard', aluno_id=current_user.id) }}">Minha Conta</a>
+                    </li>
+                {% endif %}
+                <!-- Logout para usuários autenticados -->
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            {% else %}
+                <!-- Opções para visitantes não autenticados -->
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('login') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="{{ url_for('register') }}">Registrar</a>
+                </li>
+            {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h1 class="text-center mt-5">Horários de Aulas</h1>
+    <h3 class="text-center">Horários Matutino</h3>
+    <table class="table schedule-table">
+        <thead>
+            <tr>
+                <th>Hora</th>
+                <th>Segunda</th>
+                <th>Terça</th>
+                <th>Quarta</th>
+                <th>Quinta</th>
+                <th>Sexta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>6:00</td>
+                <td>-</td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Ashtanga Yoga - Prof. Marina - Terça às 6:00">Ashtanga Yoga<br>Prof. Marina</button></td>
+                <td>-</td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Ashtanga Yoga - Prof. Marina - Quinta às 6:00">Ashtanga Yoga<br>Prof. Marina</button></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>6:15</td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Hatha Yoga - Prof. Aline - Segunda às 6:15">Hatha Yoga<br>Prof. Aline</button></td>
+                <td>-</td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Hatha Yoga - Prof. Aline - Quarta às 6:15">Hatha Yoga<br>Prof. Aline</button></td>
+                <td>-</td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Hatha Yoga - Prof. Aline - Sexta às 6:15">Hatha Yoga<br>Prof. Aline</button></td>
+            </tr>
+            <!-- Adicione mais linhas conforme necessário -->
+        </tbody>
+    </table>
+
+    <h3 class="text-center">Horários Noturno</h3>
+    <table class="table schedule-table">
+        <thead>
+            <tr>
+                <th>Hora</th>
+                <th>Segunda</th>
+                <th>Terça</th>
+                <th>Quarta</th>
+                <th>Quinta</th>
+                <th>Sexta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>18:30</td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Hatha Yoga - Prof. Aline - Segunda às 18:30">Hatha Yoga<br>Prof. Aline</button></td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Vinyasa Yoga - Prof. Rúbia - Terça às 18:30">Vinyasa Yoga<br>Prof. Rúbia</button></td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Hatha Yoga - Prof. Aline - Quarta às 18:30">Hatha Yoga<br>Prof. Aline</button></td>
+                <td><button class="schedule-btn" data-bs-toggle="modal" data-bs-target="#modalBooking" data-info="Vinyasa Yoga - Prof. Rúbia - Quinta às 18:30">Vinyasa Yoga<br>Prof. Rúbia</button></td>
+                <td>-</td>
+            </tr>
+            <!-- Adicione mais linhas conforme necessário -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalBooking" tabindex="-1" aria-labelledby="modalBookingLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalBookingLabel">Agendar Aula</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalInfo"></p>
+                <form action="/agendar" method="POST">
+                    <input type="hidden" id="inputClassInfo" name="class_info">
+                    <button type="submit" class="btn btn-primary">Confirmar Agendamento</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const modalBooking = document.getElementById('modalBooking');
+    modalBooking.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const info = button.getAttribute('data-info');
+        const modalInfo = modalBooking.querySelector('#modalInfo');
+        const inputClassInfo = modalBooking.querySelector('#inputClassInfo');
+        modalInfo.textContent = info;
+        inputClassInfo.value = info;
+    });
+</script>
+</body>
+</html>
