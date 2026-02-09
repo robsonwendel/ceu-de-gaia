@@ -14,7 +14,6 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 
 
 
-
 # Configuração do Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'senha1989'
@@ -807,8 +806,7 @@ def alterar_senha():
 
     return render_template('alterar_senha.html')
 
-from flask_mail import Mail, Message
-from itsdangerous import URLSafeTimedSerializer as Serializer
+
 
 # Configurações do Flask-Mail (usando Variáveis de Ambiente)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com' # Ou o SMTP da sua Hostinger
