@@ -9,7 +9,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import os
 from sqlalchemy import func, distinct, case
 from sqlalchemy.orm import aliased
-
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer as Serializer
 
 
 
@@ -45,7 +46,7 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(50), nullable=False)
     is_approved = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
-
+    precisa_mudar_senha = db.Column(db.Boolean, default=True)
     # Informações pessoais
     data_nascimento = db.Column(db.Date, nullable=True)
     sexo = db.Column(db.String(20), nullable=True)
@@ -275,6 +276,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, password):
             login_user(user)
             flash('Login realizado com sucesso!', 'success')
+        
             
             # Redirecionamento baseado na role
             if user.is_admin:
@@ -783,6 +785,88 @@ def cadastrar_professor():
         flash(f'Erro ao cadastrar: {e}', 'danger')
 
     return redirect(url_for('admin_dashboard'))
+
+@app.route('/alterar_senha', methods=['GET', 'POST'])
+@login_required
+def alterar_senha():
+    if request.method == 'POST':
+        nova_senha = request.form.get('nova_senha')
+        confirmacao = request.form.get('confirmacao')
+
+        if nova_senha != confirmacao:
+            flash('As senhas não coincidem!', 'danger')
+            return redirect(url_for('alterar_senha'))
+
+        hashed_password = bcrypt.generate_password_hash(nova_senha).decode('utf-8')
+        current_user.password = hashed_password
+        current_user.precisa_mudar_senha = False # Marca que ele já mudou
+        db.session.commit()
+        
+        flash('Senha alterada com sucesso!', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('alterar_senha.html')
+
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer as Serializer
+
+# Configurações do Flask-Mail (usando Variáveis de Ambiente)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com' # Ou o SMTP da sua Hostinger
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
+app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('EMAIL_USER')
+
+mail = Mail(app)
+
+# Rota para solicitar recuperação
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            send_reset_email(user)
+            flash('Um e-mail foi enviado com instruções para redefinir sua senha.', 'info')
+            return redirect(url_for('login'))
+        else:
+            flash('E-mail não encontrado.', 'warning')
+    return render_template('reset_password_request.html')
+
+def send_reset_email(user):
+    s = Serializer(app.config['SECRET_KEY'])
+    token = s.dumps(user.email, salt='reset-password')
+    msg = Message('Redefinição de Senha - Céu de Gaia',
+                  recipients=[user.email])
+    link = url_for('reset_token', token=token, _external=True)
+    msg.body = f'''Para redefinir sua senha, acesse o link abaixo:
+{link}
+
+Se você não solicitou esta alteração, ignore este e-mail.
+'''
+    mail.send(msg)
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_token(token):
+    s = Serializer(app.config['SECRET_KEY'])
+    try:
+        email = s.loads(token, salt='reset-password', max_age=1800) # Token vale por 30 min
+    except:
+        flash('O link de redefinição é inválido ou expirou.', 'danger')
+        return redirect(url_for('reset_password_request'))
+    
+    user = User.query.filter_by(email=email).first_or_404()
+    
+    if request.method == 'POST':
+        nova_senha = request.form.get('nova_senha')
+        hashed_password = bcrypt.generate_password_hash(nova_senha).decode('utf-8')
+        user.password = hashed_password
+        db.session.commit()
+        flash('Sua senha foi atualizada!', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('reset_password.html')
 
 if __name__ == '__main__':
     with app.app_context():

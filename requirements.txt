@@ -6,3 +6,4 @@ Flask-Migrate==4.0.5
 mysql-connector-python==8.2.0
 Flask-APScheduler==1.13.1
 SQLAlchemy==2.0.23
+Flask-Mail==0.9.1
