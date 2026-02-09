@@ -178,24 +178,17 @@ def horarios():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # 1. Coleta de dados básicos do formulário
+        # 1. Coleta de dados básicos e segurança
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
         
-        # 2. Verificação de Duplicidade (Evita o IntegrityError)
-        user_exists = User.query.filter_by(username=username).first()
-        if user_exists:
-            flash('Este nome de usuário já está em uso. Escolha outro.', 'danger')
+        # 2. Verificação de Duplicidade
+        if User.query.filter_by(email=email).first():
+            flash('Este e-mail já está cadastrado.', 'danger')
             return redirect(url_for('register'))
 
-        if email:
-            email_exists = User.query.filter_by(email=email).first()
-            if email_exists:
-                flash('Este e-mail já está cadastrado em outra conta.', 'danger')
-                return redirect(url_for('register'))
-
-        # 3. Tratamento de campos específicos (Data e Checkbox)
+        # 3. Tratamento de campos da ficha de saúde e contato
         data_nasc_raw = request.form.get('data_nascimento')
         data_nascimento = None
         if data_nasc_raw:
@@ -204,60 +197,48 @@ def register():
             except ValueError:
                 data_nascimento = None
 
-        # Checkbox retorna 'True' ou None
-        pratica_atividade = True if request.form.get('pratica_atividade_fisica') else False
-        intestino_regular = True if request.form.get('funcionamento_intestino') else False
-
-        # 4. Criptografia da senha
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-        # 5. Criação do objeto User com todos os campos do seu banco
+        # 4. Criação do Usuário com TODOS os campos do seu formulário
         new_user = User(
             username=username,
             email=email,
             password=hashed_password,
-            role='aluno', # Definido como padrão
-            is_approved=True, # Sua nova regra: aprovado automaticamente
+            role='aluno',
+            is_approved=True,
             is_admin=False,
+            precisa_mudar_senha=False, # Aluno cria a própria senha, não precisa mudar
             
-            # Informações Pessoais
+            # Pessoais
             data_nascimento=data_nascimento,
             sexo=request.form.get('sexo'),
             profissao=request.form.get('profissao'),
             
             # Endereço
             endereco=request.form.get('endereco'),
-            numero_endereco=request.form.get('numero_endereco'),
-            bairro=request.form.get('bairro'),
             cidade=request.form.get('cidade'),
             estado=request.form.get('estado'),
             cep=request.form.get('cep'),
             
             # Contato
             contato_1=request.form.get('contato_1'),
-            contato_2=request.form.get('contato_2'),
-            contato_emergencia=request.form.get('contato_emergencia'),
             nome_contato_emergencia=request.form.get('nome_contato_emergencia'),
             
-            # Histórico de Saúde
+            # Saúde (Anamnese)
             antecedentes_cirurgicos=request.form.get('antecedentes_cirurgicos'),
-            tratamentos_medicamentosos=request.form.get('tratamentos_medicamentosos'),
-            antecedentes_alergicos=request.form.get('antecedentes_alergicos'),
-            funcionamento_intestino=intestino_regular,
-            pratica_atividade_fisica=pratica_atividade,
+            pratica_atividade_fisica=True if request.form.get('pratica_atividade_fisica') else False,
             indicacoes_observacoes=request.form.get('indicacoes_observacoes')
         )
 
-        # 6. Salvar no Banco de Dados
         try:
             db.session.add(new_user)
             db.session.commit()
-            flash('Cadastro realizado com sucesso! Bem-vindo(a) à Céu de Gaia.', 'success')
+            flash('Cadastro realizado com sucesso!', 'success')
             return redirect(url_for('login'))
         except Exception as e:
-            db.session.rollback() # Cancela a operação se der erro
-            print(f"Erro ao cadastrar: {e}")
-            flash('Ocorreu um erro interno ao salvar seus dados. Tente novamente.', 'danger')
+            db.session.rollback()
+            print(f"Erro no banco: {e}")
+            flash('Erro ao salvar dados. Verifique se o banco está atualizado.', 'danger')
             return redirect(url_for('register'))
 
     return render_template('register.html')
