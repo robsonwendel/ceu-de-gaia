@@ -18,7 +18,7 @@ from sqlalchemy.orm import aliased
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'senha1989'
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://mysql:geh*1989@site-gaia_banco-gaia:3306/yoga_school'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'mysql+mysqlconnector://mysql:geh*1989@site-gaia_banco-gaia:3306/yoga_school'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inicialização de Extensões
